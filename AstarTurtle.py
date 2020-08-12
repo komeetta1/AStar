@@ -34,13 +34,42 @@ class Yellow(turtle.Turtle):
         self.penup()                   
         self.speed(0) 
 
-class Green(turtle.Turtle):
+class GreenForward(turtle.Turtle):
     def __init__(self):
         turtle.Turtle.__init__(self)
-        self.shape("square")
+        self.setheading(90)
+        self.shape("classic")
         self.color("green")
         self.penup()
         self.speed(0)
+
+class GreenRight(turtle.Turtle):
+    def __init__(self):
+        turtle.Turtle.__init__(self)
+        self.setheading(0)
+        self.shape("classic")
+        self.color("green")
+        self.penup()
+        self.speed(0)
+
+class GreenDown(turtle.Turtle):
+    def __init__(self):
+        turtle.Turtle.__init__(self)
+        self.setheading(270)
+        self.shape("classic")
+        self.color("green")
+        self.penup()
+        self.speed(0)
+
+class GreenLeft(turtle.Turtle):
+    def __init__(self):
+        turtle.Turtle.__init__(self)
+        self.setheading(180)
+        self.shape("classic")
+        self.color("green")
+        self.penup()
+        self.speed(0)
+
 
 class Red(turtle.Turtle):
     def __init__(self):
@@ -80,7 +109,7 @@ def kelaa(lista, n):
 
 def select_moves(direction_constraints, tulosuunta):
     fil=direction_constraints.copy()
-    moves  =  [[-1, 0 ], # ylös
+    moves  =  [[-1, 0], # ylös
              [ 0, 1 ], # oikealle
              [ 1, 0 ], # alas
              [ 0, -1]] # vasemmalle
@@ -138,7 +167,7 @@ def search(maze, cost, start, end):
         if current_node == end_node:
             crossroad.remove(start_node.position)
             for i in range(len(crossroad)):
-                time.sleep(0.06)
+                #time.sleep(0.06)
                 screen_x = -120 + (crossroad[i][1]*24)
                 screen_y = 120 - (crossroad[i][0]*24)
                 red.goto(screen_x, screen_y)
@@ -168,7 +197,7 @@ def search(maze, cost, start, end):
             
             yellow.goto(screen_x, screen_y)
             yellow.stamp()
-            time.sleep(0.03)
+            #time.sleep(0.03)
 
             if (node_position[0] > (nr_rows - 1) or 
                 node_position[0] < 0 or 
@@ -229,26 +258,79 @@ def search(maze, cost, start, end):
 
             yet_to_visit_list.append(child)
 
-
 def return_path(current_node,maze):
     path = []
-    nr_rows, nr_columns = np.shape(maze)
-    result = [[-1 for i in range(nr_columns)] for j in range(nr_rows)]
+    path_suunta = []
     current = current_node
     while current is not None:
         path.append(current.position)
+        path_suunta.append(current.tulosuunta)
         current = current.parent
     path = path[::-1]
+    path_suunta = path_suunta[::-1]
+    return ready_path(path, maze, path_suunta, current_node)
+
+def ready_path(path, maze, path_suunta, current_node):
+    nr_rows, nr_columns = np.shape(maze)
+    result = [[-1 for i in range(nr_columns)] for j in range(nr_rows)]
     start_value = 0
     for i in range(len(path)):
-        time.sleep(0.06)
         result[path[i][0]][path[i][1]] = start_value
         start_value += 1
-        screen_x = -120 + (path[i][1]*24)
-        screen_y = 120 - (path[i][0]*24)
-        green.goto(screen_x, screen_y)
-        green.stamp()
+    suuntaPath(path_suunta, path, maze, current_node)
     return result
+
+def suuntaPath(path_suunta, path, maze, current_node):
+    for z in path:
+        current_node.position = z
+        print(current_node.position)
+        for i in path_suunta:
+            if i == 1:
+                forward(path, maze, current_node)
+                path_suunta.pop(0)
+                break
+
+            elif i == 2:
+                right(path, maze, current_node)
+                path_suunta.pop(0)
+                break
+
+            elif i == 3:
+                down(path, maze, current_node)
+                path_suunta.pop(0)
+                break
+            elif i == 4:
+                left(path, maze, current_node)
+                path_suunta.pop(0)
+                break
+
+def forward(path, maze, current_node):
+    screen_x = -120 + (current_node.position[1]*24)
+    screen_y = 120 - (current_node.position[0]*24)
+    
+    greenForward.goto(screen_x, screen_y)
+    greenForward.stamp()
+    
+def right(path, maze, current_node):
+    screen_x = -120 + (current_node.position[1]*24)
+    screen_y = 120 - (current_node.position[0]*24)
+    
+    greenRight.goto(screen_x, screen_y)
+    greenRight.stamp()
+
+def down(path, maze, current_node):
+    screen_x = -120 + (current_node.position[1]*24)
+    screen_y = 120 - (current_node.position[0]*24)
+    
+    greenDown.goto(screen_x, screen_y)
+    greenDown.stamp()
+
+def left(path, maze, current_node):
+    screen_x = -120 + (current_node.position[1]*24)
+    screen_y = 120 - (current_node.position[0]*24)
+    
+    greenLeft.goto(screen_x, screen_y)
+    greenLeft.stamp()
 
 
 maze2 = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -305,7 +387,10 @@ def endProgram():
     sys.exit()
 red = Red()
 yellow = Yellow()
-green = Green()
+greenForward = GreenForward()
+greenRight = GreenRight()
+greenDown = GreenDown()
+greenLeft = GreenLeft()
 
 
 setupMaze(maze2)
