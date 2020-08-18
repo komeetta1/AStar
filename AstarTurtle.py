@@ -1,83 +1,13 @@
 import numpy as np
 from itertools import compress
 import turtle
+from Maze import maze2
+from turtleGraphic import *
 import time
 import sys
 
-wn = turtle.Screen()
-wn.bgcolor("black")
-wn.setup(1000,700)
 
 ANY, UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3, 4
-
-class Maze(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.shape("square")
-        self.color("white")
-        self.penup()
-        self.speed(0)
-
-class Floor(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.shape("square") 
-        self.color("blue")
-        self.penup()
-        self.speed(0) 
-
-class Yellow(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.shape("square")         
-        self.color("yellow")           
-        self.penup()                   
-        self.speed(0) 
-
-class GreenForward(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.setheading(90)
-        self.shape("classic")
-        self.color("green")
-        self.penup()
-        self.speed(0)
-
-class GreenRight(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.setheading(0)
-        self.shape("classic")
-        self.color("green")
-        self.penup()
-        self.speed(0)
-
-class GreenDown(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.setheading(270)
-        self.shape("classic")
-        self.color("green")
-        self.penup()
-        self.speed(0)
-
-class GreenLeft(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.setheading(180)
-        self.shape("classic")
-        self.color("green")
-        self.penup()
-        self.speed(0)
-
-
-class Red(turtle.Turtle):
-    def __init__(self):
-        turtle.Turtle.__init__(self)
-        self.shape("square")
-        self.color("red")
-        self.penup()
-        self.speed(0)
 
 class Node:
   
@@ -166,13 +96,8 @@ def search(maze, cost, start, end):
 
         if current_node == end_node:
             crossroad.remove(start_node.position)
-            for i in range(len(crossroad)):
-                #time.sleep(0.06)
-                screen_x = -120 + (crossroad[i][1]*24)
-                screen_y = 120 - (crossroad[i][0]*24)
-                red.goto(screen_x, screen_y)
-                red.stamp()
-            return return_path(current_node,maze)
+            
+            return return_path(current_node,maze,crossroad)
 
         children = []
         children2 = []
@@ -258,27 +183,31 @@ def search(maze, cost, start, end):
 
             yet_to_visit_list.append(child)
 
-def return_path(current_node,maze):
+def return_path(current_node,maze,crossroad):
     path = []
     path_suunta = []
     current = current_node
+    nr_rows, nr_columns = np.shape(maze)
+    result = [[-1 for i in range(nr_columns)] for j in range(nr_rows)]
+    start_value = 0
     while current is not None:
         path.append(current.position)
         path_suunta.append(current.tulosuunta)
         current = current.parent
     path = path[::-1]
     path_suunta = path_suunta[::-1]
-    return ready_path(path, maze, path_suunta, current_node)
-
-def ready_path(path, maze, path_suunta, current_node):
-    nr_rows, nr_columns = np.shape(maze)
-    result = [[-1 for i in range(nr_columns)] for j in range(nr_rows)]
-    start_value = 0
     for i in range(len(path)):
         result[path[i][0]][path[i][1]] = start_value
         start_value += 1
+    crossroad_list = list(set(path) & set(crossroad))
+    for y in range(len(crossroad_list)):
+                screen_x = -120 + (crossroad_list[y][1]*24)
+                screen_y = 120 - (crossroad_list[y][0]*24)
+                red.goto(screen_x, screen_y)
+                red.stamp()
     suuntaPath(path_suunta, path, maze, current_node)
     return result
+
 
 def suuntaPath(path_suunta, path, maze, current_node):
     for z in path:
@@ -333,25 +262,11 @@ def left(path, maze, current_node):
     greenLeft.stamp()
 
 
-maze2 = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 1, 0, 1, 0 ,1, 1, 1, 0, 1, 1, 1, 0, 1],
-        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 1, 0, 1, 0 ,1, 1, 1, 1, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
-        [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
-        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-        [1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1],
-        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-
 def main(maze2):
 
     start2 = [12, 11]
     end2 = [12, 3]
+    #end2 = [3,11]
 
 
     cost = 1 # cost per movement
