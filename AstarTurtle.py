@@ -2,10 +2,10 @@ import numpy as np
 from itertools import compress
 import turtle
 from Maze import maze2
-from turtleGraphic import *
+from ReturnPath import suuntaPath
+from turtleGraphic import Maze, Floor, Yellow, Red, wn
 import time
 import sys
-
 
 ANY, UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3, 4
 
@@ -26,7 +26,6 @@ class Node:
             return True
         else:
             return False
-            
 
 def kelaa(lista, n):
     tmp = lista.copy()
@@ -34,7 +33,6 @@ def kelaa(lista, n):
     while i<n:
         tmp = [tmp.pop(len(tmp)-1)] + tmp
         i=i+1
-    
     return tmp
 
 def select_moves(direction_constraints, tulosuunta):
@@ -96,7 +94,6 @@ def search(maze, cost, start, end):
 
         if current_node == end_node:
             crossroad.remove(start_node.position)
-            
             return return_path(current_node,maze,crossroad)
 
         children = []
@@ -109,8 +106,6 @@ def search(maze, cost, start, end):
         #moves = select_moves([True, False, False, True], tulosuunta)    #Vasen
         #moves = select_moves([True, True, True, True], tulosuunta)      #Kaikki
 
-        
-        
         for new_position in moves: 
 
             tulosuunta = tutki_tulosuunta(new_position)
@@ -122,7 +117,6 @@ def search(maze, cost, start, end):
             
             yellow.goto(screen_x, screen_y)
             yellow.stamp()
-            #time.sleep(0.03)
 
             if (node_position[0] > (nr_rows - 1) or 
                 node_position[0] < 0 or 
@@ -201,73 +195,18 @@ def return_path(current_node,maze,crossroad):
         start_value += 1
     crossroad_list = list(set(path) & set(crossroad))
     for y in range(len(crossroad_list)):
-                screen_x = -120 + (crossroad_list[y][1]*24)
-                screen_y = 120 - (crossroad_list[y][0]*24)
-                red.goto(screen_x, screen_y)
-                red.stamp()
+        screen_x = -120 + (crossroad_list[y][1]*24)
+        screen_y = 120 - (crossroad_list[y][0]*24)
+        red.goto(screen_x, screen_y)
+        red.stamp()
     suuntaPath(path_suunta, path, maze, current_node)
     return result
-
-
-def suuntaPath(path_suunta, path, maze, current_node):
-    for z in path:
-        current_node.position = z
-        print(current_node.position)
-        for i in path_suunta:
-            if i == 1:
-                forward(path, maze, current_node)
-                path_suunta.pop(0)
-                break
-
-            elif i == 2:
-                right(path, maze, current_node)
-                path_suunta.pop(0)
-                break
-
-            elif i == 3:
-                down(path, maze, current_node)
-                path_suunta.pop(0)
-                break
-            elif i == 4:
-                left(path, maze, current_node)
-                path_suunta.pop(0)
-                break
-
-def forward(path, maze, current_node):
-    screen_x = -120 + (current_node.position[1]*24)
-    screen_y = 120 - (current_node.position[0]*24)
-    
-    greenForward.goto(screen_x, screen_y)
-    greenForward.stamp()
-    
-def right(path, maze, current_node):
-    screen_x = -120 + (current_node.position[1]*24)
-    screen_y = 120 - (current_node.position[0]*24)
-    
-    greenRight.goto(screen_x, screen_y)
-    greenRight.stamp()
-
-def down(path, maze, current_node):
-    screen_x = -120 + (current_node.position[1]*24)
-    screen_y = 120 - (current_node.position[0]*24)
-    
-    greenDown.goto(screen_x, screen_y)
-    greenDown.stamp()
-
-def left(path, maze, current_node):
-    screen_x = -120 + (current_node.position[1]*24)
-    screen_y = 120 - (current_node.position[0]*24)
-    
-    greenLeft.goto(screen_x, screen_y)
-    greenLeft.stamp()
-
 
 def main(maze2):
 
     start2 = [12, 11]
-    end2 = [12, 3]
-    #end2 = [3,11]
-
+    #end2 = [12, 3]
+    end2 = [5,13]
 
     cost = 1 # cost per movement
 
@@ -300,13 +239,8 @@ walk = []
 def endProgram():
     wn.exitonclick()
     sys.exit()
-red = Red()
 yellow = Yellow()
-greenForward = GreenForward()
-greenRight = GreenRight()
-greenDown = GreenDown()
-greenLeft = GreenLeft()
-
+red = Red()
 
 setupMaze(maze2)
 main(maze2)
